@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Список фильмов</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<h1>Список фильмов</h1>
+<nav>
+  <ul>
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="movies.html">Фильмы</a></li>
+    <li><a href="os_info.html">Информация о сервере</a></li>
+    <li><a href="file_info.html">Информация из файла</a></li>
+  </ul>
+</nav>
+<div>
+  <form id="filterForm">
+    <label for="director">Режиссёр:</label>
+    <input type="text" id="director" name="director">
+    <label for="genre">Жанр:</label>
+    <input type="text" id="genre" name="genre">
+    <button type="submit">Обновить</button>
+  </form>
+</div>
+<div>
+  <button onclick="window.location.href='create_movie.html'">Добавить фильм</button>
+</div>
+<table id="moviesTable">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Название</th>
+    <th>Режиссёр</th>
+    <th>Жанр</th>
+    <th>Год выхода</th>
+    <th>Продолжительность (мин)</th>
+    <th>Действия</th>
+  </tr>
+  </thead>
+  <tbody>
+
+  </tbody>
+</table>
+<script src="../js/api.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterForm = document.getElementById('filterForm');
+    const directorInput = document.getElementById('director');
+    const genreInput = document.getElementById('genre');
+
+    function debounce(func, delay) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    const debouncedLoadMovies = debounce(loadMovies, 500);
+    directorInput.addEventListener('input', debouncedLoadMovies);
+    genreInput.addEventListener('input', debouncedLoadMovies);
+    loadMovies();
+  });
+
+  async function loadMovies() {
+    const director = document.getElementById('director').value;
+    const genre = document.getElementById('genre').value;
+
+    const params = {};
+    if (director) params.director = director;
+    if (genre) params.genre = genre;
+
+    try {
+      const movies = await fetchMovies(params);
+      const tbody = document.querySelector('#moviesTable tbody');
+      tbody.innerHTML = '';
+
+      movies.forEach(movie => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+                        <td>${movie.id}</td>
+                        <td>${movie.title}</td>
+                        <td>${movie.director}</td>
+                        <td>${movie.genre}</td>
+                        <td>${movie.releaseYear}</td>
+                        <td>${movie.duration}</td>
+                        <td>
+                            <button onclick="viewMovie(${movie.id})">Просмотр</button>
+                            <button onclick="editMovie(${movie.id})">Редактировать</button>
+                            <button onclick="deleteMovieConfirm(${movie.id})">Удалить</button>
+                        </td>
+                    `;
+        tbody.appendChild(row);
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  function viewMovie(id) {
+    window.location.href = `movie.html?id=${id}`;
+  }
+
+  function editMovie(id) {
+    window.location.href = `edit_movie.html?id=${id}`;
+  }
+
+  async function deleteMovieConfirm(id) {
+    if (confirm('Вы уверены, что хотите удалить этот фильм?')) {
+      try {
+        await deleteMovie(id);
+        loadMovies();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+  }
+</script>
+</body>
+</html>

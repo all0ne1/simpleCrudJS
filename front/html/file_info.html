@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Информация из файла</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<h1>Информация из файла</h1>
+<nav>
+    <ul>
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="movies.html">Фильмы</a></li>
+        <li><a href="os_info.html">Информация о сервере</a></li>
+        <li><a href="file_info.html">Информация из файла</a></li>
+    </ul>
+</nav>
+<div id="fileContent">
+
+</div>
+<button onclick="loadFileInfo()">Обновить</button>
+<script src="../js/api.js"></script>
+<script>
+    async function loadFileInfo() {
+        try {
+            const content = await fetchFileInfo();
+            const fileContentDiv = document.getElementById('fileContent');
+            fileContentDiv.innerHTML = `<pre>${content}</pre>`;
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadFileInfo);
+</script>
+</body>
+</html>

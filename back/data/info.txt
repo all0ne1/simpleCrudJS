@@ -1,0 +1,5 @@
+This is project made by Alexander Andaev
+-------------------------------------------
+Backend framework: express
+Frontend: JS + HTML + CSS
+BD: SQLite

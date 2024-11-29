@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Информация о сервере</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<h1>Информация о сервере</h1>
+<nav>
+  <ul>
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="movies.html">Фильмы</a></li>
+    <li><a href="os_info.html">Информация о сервере</a></li>
+    <li><a href="file_info.html">Информация из файла</a></li>
+  </ul>
+</nav>
+<div id="osInfo">
+  <!-- Информация об ОС будет загружена сюда -->
+</div>
+<button onclick="loadOSInfo()">Обновить</button>
+<script src="../js/api.js"></script>
+<script>
+  async function loadOSInfo() {
+    try {
+      const osInfo = await fetchOSInfo();
+      const osInfoDiv = document.getElementById('osInfo');
+      osInfoDiv.innerHTML = `
+                    <p><strong>Платформа:</strong> ${osInfo.platform}</p>
+                    <p><strong>Архитектура CPU:</strong> ${osInfo.cpuArch}</p>
+                    <p><strong>Количество ядер CPU:</strong> ${osInfo.cpuCores}</p>
+                    <p><strong>Свободная память:</strong> ${osInfo.freeMemory}</p>
+                    <p><strong>Всего памяти:</strong> ${osInfo.totalMemory}</p>
+                    <p><strong>Время работы системы:</strong> ${osInfo.uptime}</p>
+                `;
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+  setInterval(loadOSInfo, 5000);
+  loadOSInfo();
+
+  document.addEventListener('DOMContentLoaded', loadOSInfo);
+</script>
+</body>
+</html>
